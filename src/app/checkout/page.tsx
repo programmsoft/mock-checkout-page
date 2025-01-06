@@ -10,11 +10,48 @@ const CheckoutPage: React.FC = () => {
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
+  const [errors, setErrors] = useState({
+    cardNumber: "",
+    expiryDate: "",
+    cvv: "",
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
+  // Helper function to validate fields
+  const validateFields = (): boolean => {
+    let valid = true;
+    const newErrors = { cardNumber: "", expiryDate: "", cvv: "" };
+
+    // Validate Card Number
+    if (!/^\d{16}$/.test(cardNumber.replace(/\s+/g, ""))) {
+      newErrors.cardNumber = "Card number must be 16 digits.";
+      valid = false;
+    }
+
+    // Validate Expiry Date
+    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiryDate)) {
+      newErrors.expiryDate = "Expiry date must be in MM/YY format.";
+      valid = false;
+    }
+
+    // Validate CVV
+    if (!/^\d{3}$/.test(cvv)) {
+      newErrors.cvv = "CVV must be 3 digits.";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Perform validation
+    if (!validateFields()) {
+      return;
+    }
 
     setIsLoading(true);
     setMessage(null);
@@ -71,11 +108,16 @@ const CheckoutPage: React.FC = () => {
             type="text"
             id="cardNumber"
             placeholder="1234 5678 9012 3456"
-            className="shadow-md appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className={`shadow-md appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+              errors.cardNumber ? "border-red-500" : ""
+            }`}
             value={cardNumber}
             onChange={(e) => setCardNumber(e.target.value)}
             required
           />
+          {errors.cardNumber && (
+            <p className="text-red-500 text-sm mt-2">{errors.cardNumber}</p>
+          )}
         </div>
         <div className="mb-6">
           <label
@@ -88,11 +130,16 @@ const CheckoutPage: React.FC = () => {
             type="text"
             id="expiryDate"
             placeholder="MM/YY"
-            className="shadow-md appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className={`shadow-md appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+              errors.expiryDate ? "border-red-500" : ""
+            }`}
             value={expiryDate}
             onChange={(e) => setExpiryDate(e.target.value)}
             required
           />
+          {errors.expiryDate && (
+            <p className="text-red-500 text-sm mt-2">{errors.expiryDate}</p>
+          )}
         </div>
         <div className="mb-6">
           <label
@@ -105,11 +152,16 @@ const CheckoutPage: React.FC = () => {
             type="text"
             id="cvv"
             placeholder="123"
-            className="shadow-md appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className={`shadow-md appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+              errors.cvv ? "border-red-500" : ""
+            }`}
             value={cvv}
             onChange={(e) => setCvv(e.target.value)}
             required
           />
+          {errors.cvv && (
+            <p className="text-red-500 text-sm mt-2">{errors.cvv}</p>
+          )}
         </div>
         <div className="flex items-center justify-center">
           <button
